@@ -1,10 +1,10 @@
-import Formulario from "./components/Form";
+import  Pessoas from "./components/Formulario/Pessoas";
 
-function App() {
+export default function App() {
 
   return (
     <div className="App">
-      <Formulario />
+      <Pessoas />
     </div>
   )
 }
