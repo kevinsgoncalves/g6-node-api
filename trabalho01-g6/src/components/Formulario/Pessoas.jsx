@@ -6,105 +6,131 @@ export default function Pessoas() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
-  const [createdPost, setCreatedPost] = useState(null);
   const [enviado, setEnviado] = useState(false);
-  const [clientes, setClientes] = useState([]);
+  const [pessoas, setPessoas] = useState([]);
 
-  const fetchClientes = () => {
+  const API_URL =
+    "https://6a209a8ee96c1d13b587aa1c.mockapi.io/pessoas";
+
+  const fetchPessoas = () => {
     axios
-      .get("https://6a209a7ae96c1d13b587a961.mockapi.io/clientes")
+      .get(API_URL)
       .then((response) => {
-        setClientes(response.data);
+        setPessoas(response.data);
       })
-      .catch(() => console.log("erro na requisição"));
+      .catch(() => {
+        console.log("Erro na requisição");
+      });
   };
 
   useEffect(() => {
-    fetchClientes();
+    fetchPessoas();
   }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const newPost = {
-      nome: nome,
-      email: email,
-      cpf: cpf,
+    const novaPessoa = {
+      nome,
+      email,
+      cpf,
     };
+
     axios
-      .post("https://6a209a7ae96c1d13b587a961.mockapi.io/clientes", newPost)
-      .then((response) => {
-        console.log(response.data);
-        setCreatedPost(response.data);
+      .post(API_URL, novaPessoa)
+      .then(() => {
+        fetchPessoas();
+
+        setNome("");
+        setEmail("");
+        setCpf("");
+
+        setEnviado(true);
+
+        setTimeout(() => {
+          setEnviado(false);
+        }, 3000);
       })
       .catch((error) => {
         console.log("Erro na requisição", error);
       });
-    fetchClientes();
-    setEnviado(true);
   };
 
   return (
-    <div className="container">
-      <h1>Cadastro de Clientes</h1>
-        <form onSubmit={handleSubmit} className="form">
-          <div className="mb-3 row">
-            <div className="col-md-6">
-              <label htmlFor="nome" className="form-label">
-                Nome:
-              </label>
-              <input
-                type="text"
-                id="nome"
-                name="nome"
-                placeholder="Preencha o nome"
-                value={nome}
-                className="form-control mb-3"
-                required
-                onChange={(e) => setNome(e.target.value)}
-              />
-            </div>
+    <div className="container mt-4">
+      <h1 className="mb-4">Cadastro de Pessoas</h1>
 
-            <div className="col-md-6">
-              <label htmlFor="email" className="form-label">
-                Email:
-              </label>
-              <input
-                type="text"
-                id="email"
-                name="email"
-                placeholder="Preencha o email"
-                value={email}
-                className="form-control mb-3"
-                required
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
+      <form onSubmit={handleSubmit}>
+        <div className="row">
+          <div className="col-md-6 mb-3">
+            <label htmlFor="nome" className="form-label">
+              Nome:
+            </label>
 
-             <div className="col-md-6">
-              <label htmlFor="cpf" className="form-label">
-                Cpf:
-              </label>
-              <input
-                type="text"
-                id="cpf"
-                name="cpf"
-                placeholder="Preencha o cpf"
-                value={cpf}
-                className="form-control mb-3"
-                required
-                onChange={(e) => setCpf(e.target.value)}
-              />
-            </div>
+            <input
+              type="text"
+              id="nome"
+              className="form-control"
+              placeholder="Digite o nome"
+              value={nome}
+              required
+              onChange={(e) => setNome(e.target.value)}
+            />
           </div>
-          <button className="btn btn-primary">Enviar</button>
-        </form>
-        <h2  >Listagem de Clientes Cadastrados</h2>
-        <ul className="list-group">
-            {clientes.map((cliente)=> (
-                <li key={cliente.id} className="list-group-item">{cliente.id} - {cliente.nome} - {cliente.email} - {cliente.cpf}</li>
-            ))}
-        </ul>
+
+          <div className="col-md-6 mb-3">
+            <label htmlFor="email" className="form-label">
+              E-mail:
+            </label>
+
+            <input
+              type="email"
+              id="email"
+              className="form-control"
+              placeholder="Digite o e-mail"
+              value={email}
+              required
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div className="col-md-6 mb-3">
+            <label htmlFor="cpf" className="form-label">
+              CPF:
+            </label>
+
+            <input
+              type="text"
+              id="cpf"
+              className="form-control"
+              placeholder="Digite o CPF"
+              value={cpf}
+              required
+              onChange={(e) => setCpf(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <button type="submit" className="btn btn-primary">
+          Cadastrar
+        </button>
+      </form>
+
+      {enviado && (
+        <div className="alert alert-success mt-3">
+          Pessoa cadastrada com sucesso!
+        </div>
+      )}
+
+      <h2 className="mt-5 mb-3">Pessoas Cadastradas</h2>
+
+      <ul className="list-group">
+        {pessoas.map((pessoa) => (
+          <li key={pessoa.id} className="list-group-item">
+            {pessoa.id} - {pessoa.nome} - {pessoa.email} - {pessoa.cpf}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
